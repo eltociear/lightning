@@ -143,6 +143,7 @@ Explore pre-built community components in `our gallery <https://lightning.ai/com
    api_reference/frontend
    api_reference/runners
    api_reference/storage
+   api_reference/compute_config
 
 .. toctree::
    :maxdepth: 1
