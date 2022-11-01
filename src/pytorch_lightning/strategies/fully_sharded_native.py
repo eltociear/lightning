@@ -270,7 +270,7 @@ class DDPFullyShardedNativeStrategy(ParallelStrategy):
         except ValueError as e:
             error = "optimizer got an empty parameter list" in str(e)
 
-        if error or any(not _optimizer_has_flat_params(optimizer) for optimizer in self.optimizers)
+        if error or any(not _optimizer_has_flat_params(optimizer) for optimizer in self.optimizers):
             raise ValueError(
                 "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
                 " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
