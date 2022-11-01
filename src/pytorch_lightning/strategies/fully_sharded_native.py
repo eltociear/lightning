@@ -264,16 +264,18 @@ class DDPFullyShardedNativeStrategy(ParallelStrategy):
         self.setup_precision_plugin()
 
     def setup_optimizers(self, trainer: "pl.Trainer") -> None:
+        error = False
         try:
             super().setup_optimizers(trainer)
         except ValueError as e:
-            if "optimizer got an empty parameter list" in str(e):
-                raise ValueError(
-                    "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
-                    " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
-                    " `configure_optimizers()` hook."
-                )
-        # _validate_optimizers(self.optimizers)
+            error = "optimizer got an empty parameter list" in str(e)
+
+        if error or any(not _optimizer_has_flat_params(optimizer) for optimizer in self.optimizers)
+            raise ValueError(
+                "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
+                " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
+                " `configure_optimizers()` hook."
+            )
 
     def model_to_device(self) -> None:
         pass
@@ -391,13 +393,3 @@ class DDPFullyShardedNativeStrategy(ParallelStrategy):
                 cpu_offload=CPUOffload(offload_params=True),
             )
             cls._registered_strategies.append("fsdp_native_full_shard_offload")
-
-
-def _validate_optimizers(optimizers: Iterable[Optimizer]) -> None:
-    for optimizer in optimizers:
-        if not _optimizer_has_flat_params(optimizer):
-            raise ValueError(
-                "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
-                " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
-                " `configure_optimizers()` hook."
-            )
