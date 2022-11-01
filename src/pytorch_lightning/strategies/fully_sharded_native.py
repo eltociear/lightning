@@ -258,8 +258,14 @@ class DDPFullyShardedNativeStrategy(ParallelStrategy):
             self.model = self._setup_model(self.model)
         self.barrier()
 
+        self.setup_optimizers(trainer)
+        _optimizers_to_device(self.optimizers, self.root_device)
+
+        self.setup_precision_plugin()
+
+    def setup_optimizers(self, trainer: "pl.Trainer") -> None:
         try:
-            self.setup_optimizers(trainer)
+            super().setup_optimizers(trainer)
         except ValueError as e:
             if "optimizer got an empty parameter list" in str(e):
                 raise ValueError(
@@ -267,10 +273,7 @@ class DDPFullyShardedNativeStrategy(ParallelStrategy):
                     " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
                     " `configure_optimizers()` hook."
                 )
-        _validate_optimizers(self.optimizers)
-        _optimizers_to_device(self.optimizers, self.root_device)
-
-        self.setup_precision_plugin()
+        # _validate_optimizers(self.optimizers)
 
     def model_to_device(self) -> None:
         pass
