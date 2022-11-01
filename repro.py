@@ -56,10 +56,10 @@ def run():
         limit_test_batches=1,
         num_sanity_val_steps=0,
         max_epochs=1,
-        accelerator='gpu',
+        accelerator="gpu",
         enable_model_summary=False,
         precision=16,
-        strategy='fsdp_native'
+        strategy="fsdp_native",
     )
     trainer.fit(model, train_dataloaders=train_data, val_dataloaders=val_data)
     trainer.test(model, dataloaders=test_data)
