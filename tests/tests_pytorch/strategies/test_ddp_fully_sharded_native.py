@@ -252,8 +252,7 @@ def test_fully_sharded_native_strategy_checkpoint_multi_gpus(tmpdir, model, stra
 def test_invalid_parameters_in_optimizer(tmpdir):
     class CustomModel(BoringModel):
         def configure_optimizers(self):
-            layer = torch.nn.Linear(4, 5)
-            return torch.optim.Adam(layer.parameters(), lr=1e-2)
+            return torch.optim.Adam(self.parameters(), lr=1e-2)
 
     trainer = Trainer(strategy="fsdp_native", accelerator="gpu", devices=1)
     model = CustomModel()
