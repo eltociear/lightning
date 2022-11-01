@@ -13,11 +13,10 @@
 # limitations under the License.
 import contextlib
 import logging
-from typing import Any, Dict, Generator, Iterable, List, Optional, Union
+from typing import Any, Dict, Generator, List, Optional, Union
 
 import torch
 from torch import Tensor
-from torch.optim import Optimizer
 
 import pytorch_lightning as pl
 from lightning_lite.plugins import CheckpointIO, ClusterEnvironment
