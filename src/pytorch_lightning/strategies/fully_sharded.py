@@ -187,11 +187,24 @@ class DDPFullyShardedStrategy(DDPStrategy):
         if not is_overridden("configure_sharded_model", self.lightning_module):
             self.model = self._setup_model(self.model)
         self.setup_optimizers(self.lightning_module.trainer)
-        _validate_optimizers(self.optimizers)
         _optimizers_to_device(self.optimizers, self.root_device)
         self.barrier()
 
         self.setup_precision_plugin()
+
+    def setup_optimizers(self, trainer: "pl.Trainer") -> None:
+        error = False
+        try:
+            super().setup_optimizers(trainer)
+        except ValueError as e:
+            error = "optimizer got an empty parameter list" in str(e)
+
+        if error or any(not _optimizer_has_flat_params(optimizer) for optimizer in self.optimizers):
+            raise ValueError(
+                "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
+                " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
+                " `configure_optimizers()` hook."
+            )
 
     def _setup_model(self, model: torch.nn.Module) -> FullyShardedDataParallel:
         """Wraps the model into a
@@ -290,13 +303,3 @@ class DDPFullyShardedStrategy(DDPStrategy):
             cls,
             description=f"{cls.__class__.__name__}",
         )
-
-
-def _validate_optimizers(optimizers: Iterable[Optimizer]) -> None:
-    for optimizer in optimizers:
-        if not _optimizer_has_flat_params(optimizer):
-            raise ValueError(
-                "The optimizer does not seem to reference any FSDP parameters. HINT: Make sure to create the"
-                " optimizer after setting up the model by referencing `self.trainer.model.parameters()` in the"
-                " `configure_optimizers()` hook."
-            )
