@@ -1,8 +1,8 @@
 :orphan:
 
-################
-Mount Cloud Data
-################
+##############
+Add Cloud Data
+##############
 
 **Audience:** Users who want to read files stored in a Cloud Object Bucket in an app.
 
@@ -22,34 +22,25 @@ of the :class:`~lightning_app.core.work.LightningWork` it should be mounted on.
 In this example, we will mount an S3 bucket: ``s3://ryft-public-sample-data/esRedditJson/`` to ``/content/esRedditJson/``.
 
 .. code:: python
-    :emphasize-lines: 9-12
 
-    import lightning as L
     from lightning_app import CloudCompute
     from lightning_app.storage import Mount
 
-    class Flow(L.LightningFlow):
-       def __init__(self):
-           super().__init__()
-           self.my_work = MyWorkClass(
-               cloud_compute=CloudCompute(
-                   mounts=Mount(
-                       source="s3://ryft-public-sample-data/esRedditJson/",
-                       mount_path="/content/esRedditJson/",
-                   ),
-               )
-           )
-
-       def run(self):
-           self.my_work.run()
+    self.my_work = MyWorkClass(
+        cloud_compute=CloudCompute(
+            mounts=Mount(
+                source="s3://ryft-public-sample-data/esRedditJson/",
+                mount_path="/content/esRedditJson/",
+            ),
+        )
+    )
 
 You can also pass multiple mounts to a single work by passing a ``List[Mount(...), ...]`` to the
 ``CloudCompute(mounts=...)`` argument.
 
 .. note::
 
-    * Mounts are limited to 1M files.
-    * Mount objects should not be larger than 5 GiB.
+    * Mounts supported up to 1 Million files, 5GB per file. Need larger mounts? Contact support@lightning.ai
     * When adding multiple mounts, each one should have a unique ``mount_path``.
     * A maximum of 10 :class:`~lightning_app.storage.mount.Mount`\s can be added to a :class:`~lightning_app.core.work.LightningWork`.
 
