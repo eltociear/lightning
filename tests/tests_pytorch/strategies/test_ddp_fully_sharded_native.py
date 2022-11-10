@@ -44,7 +44,7 @@ class TestFSDPModel(BoringModel):
         self._init_model()
 
     def configure_optimizers(self):
-        return torch.optim.SGD(self.layer.parameters(), lr=0.1)
+        return torch.optim.SGD(self.trainer.model.parameters(), lr=0.1)
 
     def on_train_batch_end(self, outputs, batch, batch_idx) -> None:
         self._assert_layer_fsdp_instance()
