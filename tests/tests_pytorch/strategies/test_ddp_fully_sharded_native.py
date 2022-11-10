@@ -200,7 +200,7 @@ def test_fully_sharded_native_strategy_sync_batchnorm(tmpdir):
         strategy="fsdp_native",
         precision=16,
         max_epochs=1,
-        sync_batchnorm=True,
+        sync_batchnorm=False,
     )
     _run_multiple_stages(trainer, model, os.path.join(tmpdir, "last.ckpt"))
 
