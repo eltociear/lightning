@@ -1,5 +1,6 @@
 import click
 
+from lightning_app.cli.cmd_apps import _AppManager
 from lightning_app.cli.cmd_clusters import AWSClusterManager
 
 
@@ -47,3 +48,21 @@ def delete_cluster(cluster: str, force: bool = False, wait: bool = False) -> Non
     """
     cluster_manager = AWSClusterManager()
     cluster_manager.delete(cluster_id=cluster, force=force, wait=wait)
+
+
+@delete.command("app")
+@click.argument("app-name", type=str)
+@click.option(
+    "--cluster-id",
+    type=str,
+    default=None,
+    help="Delete the Lighting App from a specific Lightning AI BYOC compute cluster",
+)
+def delete_app(app_name: str, cluster_id: str) -> None:
+    """Delete a Lightning AI app and associated data and resources.
+
+    Deleting an app also deletes all app websites, works, artifacts, and logs. This permanently removes not only the
+    record of the app, but all resources associated with the app.
+    """
+    manager = _AppManager()
+    manager.delete(cluster_id=cluster_id, app_id=app_name)
